@@ -1,5 +1,6 @@
 import cv2
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 def cv_image():
@@ -155,11 +156,158 @@ def smoothing():
     # 高斯滤波高斯模糊的卷积核里的数量是满足高斯分布，相当于更重视中间
     aussian = cv2.GaussianBlur(img, (3, 5), 1)
     cv2.imshow('aussian', aussian)
-    cv2.waitKey(0)
+    cv2.waitKey(1000)
     cv2.destroyAllWindows()
 
     # 中值滤波
+    median = cv2.medianBlur(img, 5)
+    cv2.imshow('median', median)
+    cv2.waitKey(1000)
+    cv2.destroyAllWindows()
+    # 结果集中展示
+    res = np.hstack((img, blur, aussian, median))  # 对图像进行拼接、hstack横向拼接，vstack纵向拼接
+    cv2.imshow('res', res)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+
+def corrode():
+    """
+    // 形态学-腐蚀操作(需要先进行二值化)
+    :return:
+    """
+    img = cv2.imread('image/dige.png')
+    cv2.imshow('img', img)
+    cv2.waitKey(1000)
+    cv2.destroyAllWindows()
+
+    kernel = np.ones((2, 2), np.uint8)
+    erosion = cv2.erode(img, kernel, iterations=2)
+    cv2.imshow('erosion', erosion)
+    cv2.waitKey(1000)
+    cv2.destroyAllWindows()
+
+    pie = cv2.imread('image/pie.png')
+    cv2.imshow('pie', pie)
+    cv2.waitKey(1000)
+    cv2.destroyAllWindows()
+    kernel1 = np.ones((10, 10), np.uint8)
+    erosion1 = cv2.erode(pie, kernel1, iterations=1)
+    erosion2 = cv2.erode(pie, kernel1, iterations=3)
+    erosion3 = cv2.erode(pie, kernel1, iterations=4)
+    res = np.hstack((erosion1, erosion2, erosion3))
+    cv2.imshow('res', res)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+
+def expand():
+    """
+    // 形态学-膨胀操作
+    :return:
+    """
+    img = cv2.imread('image/dige.png')
+    cv2.imshow('img', img)
+    cv2.waitKey(10)
+    cv2.destroyAllWindows()
+    kernel = np.ones((3, 3), np.uint8)
+    # 先进行腐蚀操作
+    erosion = cv2.erode(img, kernel, iterations=1)
+    # 在进行膨胀操作
+    ex_erosion = cv2.dilate(erosion, kernel, iterations=1)
+    res = np.hstack((img, erosion, ex_erosion))
+    cv2.imshow('原图--腐蚀后--膨胀后', res)
+    cv2.waitKey(10)
+    cv2.destroyAllWindows()
+
+    pie = cv2.imread('image/pie.png')
+    kernel = np.ones((20, 20), np.uint8)
+    ex_erosion1 = cv2.dilate(pie, kernel, iterations=1)
+    ex_erosion2 = cv2.dilate(pie, kernel, iterations=2)
+    ex_erosion3 = cv2.dilate(pie, kernel, iterations=6)
+    res1 = np.hstack((ex_erosion1, ex_erosion2, ex_erosion3))
+    cv2.imshow('res1', res1)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+
+def opening_closing():
+    """
+    // 开运算与闭运算
+    // 开运算：先腐蚀在膨胀
+    // 闭运算：先膨胀在腐蚀
+    :return:
+    """
+    # // 开运算 //
+    img = cv2.imread('image/dige.png')
+    cv2.imshow('img', img)
+    cv2.waitKey(10)
+    cv2.destroyAllWindows()
+    kernel = np.ones((3, 3), np.uint8)
+    # 先进行腐蚀操作 分步操作
+    erosion = cv2.erode(img, kernel, iterations=1)
+    # 再进行膨胀操作
+    ex_erosion = cv2.dilate(erosion, kernel, iterations=1)
+
+    # 直接进行开运算，一步到位
+    opening = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
+    res = np.hstack((erosion, ex_erosion, opening))
+    cv2.imshow('分步开运算：腐蚀后--膨胀后-：-一步开运算开运算', res)
+    cv2.waitKey(10)
+    cv2.destroyAllWindows()
+    if (ex_erosion == opening).all():  # 检验分步开运算与一步开运算结果是否一致
+        print(True)
+    else:
+        print(False)
+
+    # // 闭运算 //
+    # 先进行膨胀操作
+    ex_erosion1 = cv2.dilate(img, kernel, iterations=1)
+    # 再进行腐蚀操作
+    erosion1 = cv2.erode(ex_erosion1, kernel, iterations=1)
+    # 直接进行闭运算，一步到位
+    closing = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)
+    res1 = np.hstack((ex_erosion1, erosion1, closing))
+    cv2.imshow('res1', res1)
+    cv2.waitKey(10)
+    cv2.destroyAllWindows()
+    if (closing == erosion1).all():  # 检验分步闭运算与一步闭运算结果是否一致
+        print(True)
+    else:
+        print(False)
+
+
+def gradient():
+    """
+    // 形态学操作-梯度计算 = 膨胀 - 腐蚀
+    :return:
+    """
+    img = cv2.imread('image/pie.png')
+    kernel = np.ones((10, 10), np.uint8)
+    gradient1 = cv2.morphologyEx(img, cv2.MORPH_GRADIENT, kernel)
+    cv2.imshow('gradient1', gradient1)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+
+def top_black_hat():
+    """
+    // 顶帽&黑帽
+    // 顶帽 = 原始图像 - 开运算的结果
+    // 黑帽 = 闭运算 - 原始图像
+    :return:
+    """
+    img = cv2.imread('image/dige.png')
+    kernel = np.ones((3, 3), np.uint8)
+    # 顶帽
+    top_hat = cv2.morphologyEx(img, cv2.MORPH_TOPHAT, kernel)
+    # 黑帽
+    black_hat = cv2.morphologyEx(img, cv2.MORPH_BLACKHAT, kernel)
+    res = np.hstack((top_hat, black_hat))
+    cv2.imshow('res', res)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
 
 if __name__ == '__main__':
-    smoothing()
+    top_black_hat()
