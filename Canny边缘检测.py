@@ -9,14 +9,14 @@ import numpy as np
 # 4、应用双阈值（Double-Threshold）检测来确定真实的和潜在边缘
 # 5、通过抑制孤立的弱边缘最终完成边缘检测
 
-def cc():
+def canny():
     """
     // Canny边缘检测
     :return:
     """
     img = cv2.imread('image/lena.jpg', cv2.IMREAD_GRAYSCALE)
-    canny1 = cv2.Canny(img, 80, 150)
-    canny2 = cv2.Canny(img, 50, 100)
+    canny1 = cv2.Canny(img, 99, 100)
+    canny2 = cv2.Canny(img, 99, 100)
     res = np.hstack((canny1, canny2))
     cv2.imshow('res', res)
     cv2.waitKey(0)
@@ -24,4 +24,4 @@ def cc():
 
 
 if __name__ == '__main__':
-    cc()
+    canny()
