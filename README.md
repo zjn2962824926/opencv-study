@@ -1,0 +1,3 @@
+# opencv-study
+# 当前仅用于opencv学习使用
+# opencv-python==4.3.1.15...
