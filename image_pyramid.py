@@ -12,7 +12,7 @@ def pyramid():
     cv2.imshow('pyramid_up', pyramid_up)
     cv2.waitKey(10)
     cv2.destroyAllWindows()
-    pyramid_down = cv2.pyrDown(img)
+    pyramid_down = cv2.pyrDown(img)  # 下采样
     cv2.imshow('pyramid_down', pyramid_down)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
