@@ -10,7 +10,7 @@ def template():
     """
     img = cv2.imread('image/lena.jpg', 0)
     tem = cv2.imread('image/face.jpg', 0)
-    h, w = tem.shape[:2]
+    # h, w = tem.shape[:2]
     print(f'img.shape:{img.shape}')
     print(f'tem.shape:{tem.shape}')
     matchTemplate = ['cv2.TM_SQDIFF', 'cv2.TM_CCORR', 'cv2.TM_CCOEFF', 'cv2.TM_SQDIFF_NORMED', "cv2.TM_CCORR_NORMED",

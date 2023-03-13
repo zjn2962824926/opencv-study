@@ -67,5 +67,16 @@ def equalization_effect():
     cv_imshow.show_img('res', res)
 
 
+def fourier_transform():
+    """
+    // 傅里叶变换
+    // 频域&时域
+    :return:
+    """
+    img = cv2.imread('image/lena.jpg')
+    img_float32 = np.float32(img)
+    dft = cv2.dft(img_float32, flags=cv2.DFT_COMPLEX_OUTPUT)
+
+
 if __name__ == '__main__':
     equalization_effect()
