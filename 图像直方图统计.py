@@ -73,10 +73,53 @@ def fourier_transform():
     // 频域&时域
     :return:
     """
-    img = cv2.imread('image/lena.jpg')
+    img = cv2.imread('image/lena.jpg', 0)
     img_float32 = np.float32(img)
     dft = cv2.dft(img_float32, flags=cv2.DFT_COMPLEX_OUTPUT)
+    dft_shift = np.fft.fftshift(dft)
+    # 得到灰度图能表示的形式
+    magnitude = 20 * np.log(cv2.magnitude(dft_shift[:, :, 0], dft_shift[:, :, 1]))
+    plt.subplot(121), plt.imshow(img, cmap='gray')
+    plt.title("input Image"), plt.xticks([]), plt.yticks([])
+    plt.subplot(122), plt.imshow(magnitude, cmap='gray')
+    plt.title('Magnitude Spectrum'), plt.xticks([]), plt.yticks([])
+    plt.show()
+
+
+def lpf_hpf():
+    """
+    // 低通滤波&高通滤波
+    :return:
+    """
+    img = cv2.imread("image/lena.jpg", 0)
+    img_float32 = np.float32(img)
+    dft = cv2.dft(img_float32, flags=cv2.DFT_COMPLEX_OUTPUT)
+    dft_shift = np.fft.fftshift(dft)
+    rows, cols = img.shape
+    crow, cool = int(rows / 2), int(cols / 2)  # 中心位置
+    # 低通滤波器
+    mask = np.zeros((rows, cols, 2), np.uint8)
+    mask[crow - 30:crow + 30, cool - 30:cool + 30] = 1
+    # 高通滤波器
+    mask_hpf = np.ones((rows, cols, 2), np.uint8)
+    mask_hpf[crow - 30:crow + 30, cool - 3:cool + 30] = 0
+    # IDFT是dft的逆变换
+    fshift = dft_shift * mask
+    fshift_hpf = dft_shift * mask_hpf
+    f_shift = np.fft.fftshift(fshift)
+    f_shift_hpf = np.fft.fftshift(fshift_hpf)
+    img_back = cv2.idft(f_shift)
+    img_back_hpf = cv2.idft(f_shift_hpf)
+    img_back1 = cv2.magnitude(img_back[:, :, 0], img_back[:, :, 1])
+    img_back1_hpf = cv2.magnitude(img_back_hpf[:, :, 0], img_back_hpf[:, :, 1])
+    plt.subplot(131), plt.imshow(img, cmap='gray')
+    plt.title('artwork master'), plt.xticks([]), plt.yticks([])
+    plt.subplot(132), plt.imshow(img_back1, cmap='gray')
+    plt.title('lpf_img'), plt.xticks([]), plt.yticks([])
+    plt.subplot(133), plt.imshow(img_back1_hpf, cmap='gray')
+    plt.title('hpf_img'), plt.xticks([]), plt.yticks([])
+    plt.show()
 
 
 if __name__ == '__main__':
-    equalization_effect()
+    lpf_hpf()
